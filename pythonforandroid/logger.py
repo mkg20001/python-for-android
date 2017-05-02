@@ -181,11 +181,12 @@ def shprint(command, *args, **kwargs):
                         '\t', ' ').replace(
                             '\b', ' ').rstrip()
                 if msg:
-                    stdout.write(u'{}\r{}{:<{width}}'.format(
-                        Err_Style.RESET_ALL, msg_hdr,
-                        shorten_string(msg, msg_width), width=msg_width))
-                    stdout.flush()
-                    need_closing_newline = True
+                    if "CI_MODE" not in os.environ or not os.environ['CI_MODE']:
+                        stdout.write(u'{}\r{}{:<{width}}'.format(
+                            Err_Style.RESET_ALL, msg_hdr,
+                            shorten_string(msg, msg_width), width=msg_width))
+                        stdout.flush()
+                        need_closing_newline = True
             else:
                 logger.debug(''.join(['\t', line.rstrip()]))
         if need_closing_newline:
