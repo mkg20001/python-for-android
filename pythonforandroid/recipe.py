@@ -142,8 +142,9 @@ class Recipe(with_metaclass(RecipeMeta)):
                 else:
                     progression = '{0:.2f}%'.format(
                         index * blksize * 100. / float(size))
-                stdout.write('- Download {}\r'.format(progression))
-                stdout.flush()
+                if "CI_MODE" not in environ or not environ['CI_MODE']:
+                    stdout.write('- Download {}\r'.format(progression))
+                    stdout.flush()
 
             if exists(target):
                 unlink(target)
