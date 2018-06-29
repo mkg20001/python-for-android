@@ -26,6 +26,8 @@ class GeventRecipe(CythonRecipe):
         env['LIBS'] = ''.join(re.findall(regex, env['LDFLAGS'])).strip()
         env['LDFLAGS'] = re.sub(regex, '', env['LDFLAGS'])
         info('Moved "{}" from LDFLAGS to LIBS.'.format(env['LIBS']))
+        # linker to use the correct gcc (cross compiler) plus additional libs
+        env['LDSHARED'] = '{} -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions {}'.format(env['CC'], env['LIBS'])
         return env
 
 
