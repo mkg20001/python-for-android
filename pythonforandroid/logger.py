@@ -175,31 +175,31 @@ def shprint(command, *args, **kwargs):
         msg_hdr = '           working: '
         msg_width = columns - len(msg_hdr) - 1
         output = command(*args, **kwargs)
-        for line in output:
-            if isinstance(line, bytes):
-                line = line.decode('utf-8', errors='replace')
-            if logger.level > logging.DEBUG:
-                if full_debug:
-                    stdout.write(line)
-                    stdout.flush()
-                    continue
-                msg = line.replace(
-                    '\n', ' ').replace(
-                        '\t', ' ').replace(
-                            '\b', ' ').rstrip()
-                if msg:
-                    if "CI" not in os.environ:
+        if "CI" not in os.environ and "P4A_NO_PRINT" not in os.environ:
+            for line in output:
+                if isinstance(line, bytes):
+                    line = line.decode('utf-8', errors='replace')
+                if logger.level > logging.DEBUG:
+                    if full_debug:
+                        stdout.write(line)
+                        stdout.flush()
+                        continue
+                    msg = line.replace(
+                        '\n', ' ').replace(
+                            '\t', ' ').replace(
+                                '\b', ' ').rstrip()
+                    if msg:
                         stdout.write(u'{}\r{}{:<{width}}'.format(
                             Err_Style.RESET_ALL, msg_hdr,
                             shorten_string(msg, msg_width), width=msg_width))
                         stdout.flush()
                         need_closing_newline = True
-            else:
-                logger.debug(''.join(['\t', line.rstrip()]))
-        if need_closing_newline:
-            stdout.write('{}\r{:>{width}}\r'.format(
-                Err_Style.RESET_ALL, ' ', width=(columns - 1)))
-            stdout.flush()
+                else:
+                    logger.debug(''.join(['\t', line.rstrip()]))
+            if need_closing_newline:
+                stdout.write('{}\r{:>{width}}\r'.format(
+                    Err_Style.RESET_ALL, ' ', width=(columns - 1)))
+                stdout.flush()
     except sh.ErrorReturnCode as err:
         if need_closing_newline:
             stdout.write('{}\r{:>{width}}\r'.format(
